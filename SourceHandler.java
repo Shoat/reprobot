@@ -2,6 +2,7 @@ import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.User;
 import org.pircbotx.PircBotX;
+import org.pircbotx.Colors;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Collections;
@@ -36,12 +37,12 @@ public class SourceHandler extends ListenerAdapter {
 		String talker = event.getUser().getNick();
 
 		for (String s : celebList) {
-			if (s.equals(talker)) {
+			if (s.equals(talker.toLowerCase())) {
 				hit = true;
 			}
 		}
 		if (hit) {
-			destBot.sendMessage(destChannel, message);
+			destBot.sendMessage(destChannel, Colors.GREEN+"["+talker+"] "+message);
 		}
 
 	}
