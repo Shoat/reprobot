@@ -63,7 +63,9 @@ public class ReproBot extends ListenerAdapter {
 		//add misc listeners.  only dest bot gets command handlers
 		destBot.getListenerManager().addListener(new BanterBox());
 		destBot.getListenerManager().addListener(new PermissionsHandler());
-		sourceBot.getListenerManager().addListener(new GeneralHandler(sourceBot, destBot, props));
+		SourceHandler sh = new SourceHandler(sourceBot, destBot, props);
+		sourceBot.getListenerManager().addListener(sh);
+		destBot.getListenerManager().addListener(new DestHandler(sourceBot, destBot, sh, props));
 
 		//connect
 		sourceBot.setVerbose(true);
