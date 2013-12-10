@@ -37,7 +37,7 @@ public class DestHandler extends ListenerAdapter {
 		if (scanner.hasNext("!stalk")) {
 			
 			scanner.next();
-			if (!pm.isAllowed(command,event.getUser(),event.getChannel())) {
+			if (false) {
 				event.respond("Sorry, you do not have permission to stalk dudes.");
 				return;
 			} else {
@@ -55,10 +55,28 @@ public class DestHandler extends ListenerAdapter {
 					//kill the list
 					sh.purgeCelebs();
 					event.respond("Purged celeb list.");
+				} else if (scanner.hasNext("list")) {
+					//who is stalked?
+					LinkedList<String> celebs = sh.listCelebs();
+					String peeps ="";
+					for (String s : celebs) {
+						peeps += (s+" ");
+					}
+					event.respond("Tracking " + peeps);
 				} else {
 					event.respond("I am a tiger.");
 				}
 			}
+		}
+		if (scanner.hasNext("!bootstrap")) {
+			sh.addCeleb("tiy");
+			sh.addCeleb("bartwe");
+			sh.addCeleb("bartwe_");
+			sh.addCeleb("mollygos");
+			sh.addCeleb("kyren");
+			sh.addCeleb("omnipotententity");
+			
+			event.respond("Sane stalking defaults implemented.");
 		}
 		if (scanner.hasNext("!status")) {
 			event.respond("Oh yeah, I'll get right on that.");

@@ -42,7 +42,7 @@ public class SourceHandler extends ListenerAdapter {
 			}
 		}
 		if (hit) {
-			destBot.sendMessage(destChannel, Colors.GREEN+"["+talker+"] "+message);
+			destBot.sendMessage(destChannel, Colors.BOLD+"["+talker+"] "+message);
 		}
 
 	}
