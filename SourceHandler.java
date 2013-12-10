@@ -6,7 +6,9 @@ import org.pircbotx.Colors;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class SourceHandler extends ListenerAdapter {
 
@@ -17,6 +19,8 @@ public class SourceHandler extends ListenerAdapter {
 	private PircBotX destBot;
 	private LinkedList<String> celebList;
 	private Properties props;
+	private HashMap<String, String> context;
+
 		
 	public SourceHandler(PircBotX sourceBot, PircBotX destBot, Properties props) {
 		super();
@@ -26,6 +30,7 @@ public class SourceHandler extends ListenerAdapter {
 		System.out.println("PermissionsHandler initialized in SourceHandler.");
 		celebList = new LinkedList<String>();
 		this.props = props;
+		context = new HashMap<String, String>();
 	}
 			
 	public void onMessage(MessageEvent event) {
@@ -42,8 +47,33 @@ public class SourceHandler extends ListenerAdapter {
 			}
 		}
 		if (hit) {
+			//System.out.println("ENTERING CELEB HIT LOOP");
+			// check if context necessary and send thorugh celeb message
+			Scanner messageScanner = new Scanner(message.toLowerCase()).useDelimiter("\\s*:\\s*");
+			Set<User> users = event.getChannel().getUsers();
+			while (messageScanner.hasNext()) {
+				String token = messageScanner.next();
+				//System.out.println("CHECKING ON TOKEN: "+token);
+				for (User u : users) {
+					String userNick = u.getNick().toLowerCase();
+					//System.out.println("COMPARING "+token+" TO NICK "+userNick);
+					if (token.equals(userNick)) {
+						//System.out.println("MATCH - GETTING CONTEXT MESSAGE");
+						String contextMessage = context.get(userNick);
+						if (contextMessage != null) {
+							//System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
+							destBot.sendMessage(destChannel, Colors.BOLD+"[CONTEXT]["+userNick+"] "+contextMessage);
+						}
+					}
+				}
+			}
 			destBot.sendMessage(destChannel, Colors.BOLD+"["+talker+"] "+message);
+		} else {
+			//System.out.println("ENTERING CONTEXT PUT CLAUSE");
+			// not from a celeb, store it for context
+			context.put(talker.toLowerCase(), message);
 		}
+
 
 	}
 
