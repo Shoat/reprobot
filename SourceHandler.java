@@ -50,7 +50,6 @@ public class SourceHandler extends ListenerAdapter {
 			System.out.println("ENTERING CELEB HIT LOOP");
 			// check if context necessary and send thorugh celeb message
 			Scanner messageScanner = new Scanner(message.toLowerCase()).useDelimiter("[:,]?\\s+");
-			Set<User> users = event.getChannel().getUsers();
 			while (messageScanner.hasNext()) {
 				String token = messageScanner.next();
 				System.out.println("CHECKING ON TOKEN: "+token);
@@ -58,7 +57,7 @@ public class SourceHandler extends ListenerAdapter {
 				String contextMessage = context.get(lowerToken);
 				if (contextMessage != null) {
 					System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
-					destBot.sendMessage(destChannel, Colors.BOLD+"[CONTEXT]"+contextMessage);
+					destBot.sendMessage(destChannel, Colors.BOLD+"[CONTEXT]"+"["+token+"] "+contextMessage);
 					context.remove(lowerToken);
 				}
 			}
@@ -66,7 +65,7 @@ public class SourceHandler extends ListenerAdapter {
 		} else {
 			System.out.println("ENTERING CONTEXT PUT CLAUSE");
 			// not from a celeb, store it for context
-			context.put(talker.toLowerCase(), "[" + talker + "] " + message);
+			context.put(talker.toLowerCase(), message);
 		}
 
 
