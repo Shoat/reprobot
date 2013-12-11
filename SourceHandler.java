@@ -47,21 +47,21 @@ public class SourceHandler extends ListenerAdapter {
 			}
 		}
 		if (hit) {
-			//System.out.println("ENTERING CELEB HIT LOOP");
+			System.out.println("ENTERING CELEB HIT LOOP");
 			// check if context necessary and send thorugh celeb message
-			Scanner messageScanner = new Scanner(message.toLowerCase()).useDelimiter("\\s*[:,]?\\s*");
+			Scanner messageScanner = new Scanner(message.toLowerCase()).useDelimiter("[:,]?\\s+");
 			Set<User> users = event.getChannel().getUsers();
 			while (messageScanner.hasNext()) {
 				String token = messageScanner.next();
-				//System.out.println("CHECKING ON TOKEN: "+token);
+				System.out.println("CHECKING ON TOKEN: "+token);
 				for (User u : users) {
 					String userNick = u.getNick().toLowerCase();
-					//System.out.println("COMPARING "+token+" TO NICK "+userNick);
+					System.out.println("COMPARING "+token+" TO NICK "+userNick);
 					if (token.equals(userNick)) {
-						//System.out.println("MATCH - GETTING CONTEXT MESSAGE");
+						System.out.println("MATCH - GETTING CONTEXT MESSAGE");
 						String contextMessage = context.get(userNick);
 						if (contextMessage != null) {
-							//System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
+							System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
 							destBot.sendMessage(destChannel, Colors.BOLD+"[CONTEXT]["+userNick+"] "+contextMessage);
 						}
 					}
