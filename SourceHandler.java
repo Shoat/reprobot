@@ -49,7 +49,7 @@ public class SourceHandler extends ListenerAdapter {
 		if (hit) {
 			System.out.println("ENTERING CELEB HIT LOOP");
 			// check if context necessary and send thorugh celeb message
-			Scanner messageScanner = new Scanner(message.toLowerCase()).useDelimiter("[:,]?\\s+");
+			Scanner messageScanner = new Scanner(message.toLowerCase()).useDelimiter("[:,\\?>]?\\s+");
 			while (messageScanner.hasNext()) {
 				String token = messageScanner.next();
 				System.out.println("CHECKING ON TOKEN: "+token);
