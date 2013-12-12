@@ -54,24 +54,19 @@ public class SourceHandler extends ListenerAdapter {
 			while (messageScanner.hasNext()) {
 				String token = messageScanner.next();
 				System.out.println("CHECKING ON TOKEN: "+token);
-				for (User u : users) {
-					String userNick = u.getNick().toLowerCase();
-					System.out.println("COMPARING "+token+" TO NICK "+userNick);
-					if (token.equals(userNick)) {
-						System.out.println("MATCH - GETTING CONTEXT MESSAGE");
-						String contextMessage = context.get(userNick);
-						if (contextMessage != null) {
-							System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
-							destBot.sendMessage(destChannel, Colors.BOLD+"[CONTEXT]["+userNick+"] "+contextMessage);
-						}
-					}
+				String lowerToken = token.toLowerCase();
+				String contextMessage = context.get(lowerToken);
+				if (contextMessage != null) {
+					System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
+					destBot.sendMessage(destChannel, Colors.BOLD+"[CONTEXT]"+contextMessage);
+					context.remove(lowerToken);
 				}
 			}
 			destBot.sendMessage(destChannel, Colors.BOLD+"["+talker+"] "+message);
 		} else {
-			//System.out.println("ENTERING CONTEXT PUT CLAUSE");
+			System.out.println("ENTERING CONTEXT PUT CLAUSE");
 			// not from a celeb, store it for context
-			context.put(talker.toLowerCase(), message);
+			context.put(talker.toLowerCase(), "[" + talker + "] " + message);
 		}
 
 
