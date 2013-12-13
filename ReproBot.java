@@ -26,7 +26,7 @@ public class ReproBot extends ListenerAdapter {
 			
 			try {
 				props.setProperty("source_irc_server", "irc.slashnet.org");
-				props.setProperty("source_irc_channel", "#reprobotsource");
+				props.setProperty("source_irc_channel", "#reprobotsource,#reprobotsource1");
 				props.setProperty("dest_irc_server", "irc.slashnet.org");
 				props.setProperty("dest_irc_channel", "#reprobotdest");
 				props.setProperty("source_bot_nick", "reprobot");
@@ -50,7 +50,7 @@ public class ReproBot extends ListenerAdapter {
 			System.exit(1);
 		}
 		String sourceIrcServer = props.getProperty("source_irc_server");
-		String sourceIrcChannel = props.getProperty("source_irc_channel");
+		String sourceIrcChannels = props.getProperty("source_irc_channel");
 		String destIrcServer = props.getProperty("dest_irc_server");
 		String destIrcChannel = props.getProperty("dest_irc_channel");
 		String sourceBotNick = props.getProperty("source_bot_nick");
@@ -91,15 +91,25 @@ public class ReproBot extends ListenerAdapter {
 
 
 		//join channels
-		sourceBot.joinChannel(sourceIrcChannel);
+		String[] channels = sourceIrcChannels.split(",");
+		for (String channel : channels) {
+			sourceBot.joinChannel(channel);
+		}
+		if (channels.length > 1) {
+			props.setProperty("multichannel", "true");
+		} else {
+			props.setProperty("multichannel", "false");
+		}
 		destBot.joinChannel(destIrcChannel);
 		
 		//pause to let channel join complete.  If we failed, exit.	
 		Thread.sleep(5000);
 		boolean killit = false;
-		if (!sourceBot.channelExists(sourceIrcChannel)) {
-			System.out.println("*** Bot failed to connect to channel \""+sourceIrcChannel+"\".  Either we got shunted,  or the server is experiencing unusual load.");
-			killit = true;
+		for (String channel : channels) {
+			if (!sourceBot.channelExists(channel)) {
+				System.out.println("*** Bot failed to connect to channel \""+channel+"\".  Either we got shunted,  or the server is experiencing unusual load.");
+				killit = true;
+			}
 		}
 		if (!destBot.channelExists(destIrcChannel)) {
 			System.out.println("*** Bot failed to connect to channel \""+destIrcChannel+"\".  Either we got shunted, or the server is experiencing unusual load.");

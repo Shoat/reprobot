@@ -19,7 +19,7 @@ public class SourceHandler extends ListenerAdapter {
 	private PircBotX destBot;
 	private LinkedList<String> celebList;
 	private Properties props;
-	private HashMap<String, String> context;
+	private HashMap<String, HashMap<String, String>> context;
 
 		
 	public SourceHandler(PircBotX sourceBot, PircBotX destBot, Properties props) {
@@ -30,7 +30,7 @@ public class SourceHandler extends ListenerAdapter {
 		System.out.println("PermissionsHandler initialized in SourceHandler.");
 		celebList = new LinkedList<String>();
 		this.props = props;
-		context = new HashMap<String, String>();
+		context = new HashMap<String, HashMap<String, String>>();
 	}
 			
 	public void onMessage(MessageEvent event) {
@@ -40,6 +40,11 @@ public class SourceHandler extends ListenerAdapter {
 
 		boolean hit = false;
 		String talker = event.getUser().getNick();
+		String channel = event.getChannel().getName();
+		String channelText = "";
+		if (this.props.getProperty("multichannel") == "true") {
+			channelText = "[" + channel + "]";
+		}
 
 		for (String s : celebList) {
 			if (s.equals(talker.toLowerCase())) {
@@ -54,18 +59,26 @@ public class SourceHandler extends ListenerAdapter {
 				String token = messageScanner.next();
 				System.out.println("CHECKING ON TOKEN: "+token);
 				String lowerToken = token.toLowerCase();
-				String contextMessage = context.get(lowerToken);
-				if (contextMessage != null) {
-					System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
-					destBot.sendMessage(destChannel, Colors.BOLD+"[CONTEXT]"+"["+token+"] "+contextMessage);
-					context.remove(lowerToken);
+				HashMap<String, String> channelContext = context.get(channel);
+				if (channelContext != null) {
+					String contextMessage = channelContext.get(lowerToken);
+					if (contextMessage != null) {
+						System.out.println("CONTEXT RECEIVED - SENDING MESSAGE "+ contextMessage);
+						destBot.sendMessage(destChannel, Colors.BOLD+channelText+"[CONTEXT]"+"["+token+"] "+contextMessage);
+						context.remove(lowerToken);
+					}
 				}
 			}
-			destBot.sendMessage(destChannel, Colors.BOLD+"["+talker+"] "+message);
+			destBot.sendMessage(destChannel, Colors.BOLD+channelText+"["+talker+"] "+message);
 		} else {
 			System.out.println("ENTERING CONTEXT PUT CLAUSE");
 			// not from a celeb, store it for context
-			context.put(talker.toLowerCase(), message);
+			HashMap<String, String> toAdd = context.get(channel);
+			if (toAdd == null) {
+				toAdd = new HashMap<String, String>();
+				context.put(channel, toAdd);
+			}
+			toAdd.put(talker.toLowerCase(), message);
 		}
 
 
