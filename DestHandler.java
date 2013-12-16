@@ -71,7 +71,6 @@ public class DestHandler extends ListenerAdapter {
 		if (scanner.hasNext("!bootstrap")) {
 			sh.addCeleb("tiy");
 			sh.addCeleb("tiyuri");
-			sh.addCeleb("seria-myouna");
 			sh.addCeleb("bartwe");
 			sh.addCeleb("bartwe_");
 			sh.addCeleb("mollygos");
