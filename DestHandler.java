@@ -34,11 +34,11 @@ public class DestHandler extends ListenerAdapter {
 		
 		scanner = new Scanner(commandLower);
 
-		if (scanner.hasNext("!stalk")) {
+		if (scanner.hasNext("!echo")) {
 			
 			scanner.next();
 			if (false) {
-				event.respond("Sorry, you do not have permission to stalk dudes.");
+				event.respond("Sorry, you do not have permission to manipulate the echo list.");
 				return;
 			} else {
 				if (scanner.hasNext("add")) {
@@ -47,14 +47,14 @@ public class DestHandler extends ListenerAdapter {
 					if (scanner.hasNext()) {
 						String target = scanner.next();
 						sh.addCeleb(target);
-						event.respond("Added "+target+" to celeb list.");
+						event.respond("Added "+target+" to echo list.");
 					} else {
 						event.respond("Who am I adding, exactly?  Spelling counts.");
 					}
 				} else if (scanner.hasNext("purge")) {
 					//kill the list
 					sh.purgeCelebs();
-					event.respond("Purged celeb list.");
+					event.respond("Purged echo list.");
 				} else if (scanner.hasNext("list")) {
 					//who is stalked?
 					LinkedList<String> celebs = sh.listCelebs();
@@ -70,13 +70,15 @@ public class DestHandler extends ListenerAdapter {
 		}
 		if (scanner.hasNext("!bootstrap")) {
 			sh.addCeleb("tiy");
+			sh.addCeleb("tiyuri");
+			sh.addCeleb("seria-myouna");
 			sh.addCeleb("bartwe");
 			sh.addCeleb("bartwe_");
 			sh.addCeleb("mollygos");
 			sh.addCeleb("kyren");
 			sh.addCeleb("omnipotententity");
 			
-			event.respond("Sane stalking defaults implemented.");
+			event.respond("Sane echo defaults implemented.");
 		}
 		if (scanner.hasNext("!status")) {
 			event.respond("Oh yeah, I'll get right on that.");
