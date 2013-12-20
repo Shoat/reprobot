@@ -61,11 +61,13 @@ public class ReproBot extends ListenerAdapter {
 		PermissionsManager pm = PermissionsManager.initInstance(ownernick);
 		
 		//add misc listeners.  only dest bot gets command handlers
-		destBot.getListenerManager().addListener(new BanterBox());
 		destBot.getListenerManager().addListener(new PermissionsHandler());
 		SourceHandler sh = new SourceHandler(sourceBot, destBot, props);
 		sourceBot.getListenerManager().addListener(sh);
 		destBot.getListenerManager().addListener(new DestHandler(sourceBot, destBot, sh, props));
+
+		//set up twitter listener
+		destBot.getListenerManager().addListener(new TwitterListener(destBot, destIrcChannel, props));
 
 		//connect
 		sourceBot.setVerbose(true);
