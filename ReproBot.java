@@ -34,6 +34,7 @@ public class ReproBot extends ListenerAdapter {
 				props.setProperty("source_nick_pass", "");
 				props.setProperty("dest_nick_pass", "");
 				props.setProperty("ownernick", "maradine");
+				props.setProperty("twitter_bootstrap", "user1,user2");
 		
 				props.store(new FileOutputStream("reprobot.properties"), null);
 			} catch (IOException ioe2) {

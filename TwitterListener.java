@@ -30,6 +30,7 @@ public class TwitterListener extends ListenerAdapter<PircBotX> {
 	private HashMap<String, Long> usersToFollow;
 	private PircBotX bot;
 	private String channel;
+	private Properties props;
 	private StatusListener listener;
 	private RequestToken requestToken;
 	private boolean oauthInit = false;
@@ -40,6 +41,7 @@ public class TwitterListener extends ListenerAdapter<PircBotX> {
 	public TwitterListener(final PircBotX bot, final String channel, Properties props) {
 		this.bot = bot;
 		this.channel = channel;
+		this.props = props;
 		usersToFollow = new HashMap<String, Long>();
 		this.listener = new StatusListener() {
 			private TwitterListener parent;
@@ -137,6 +139,17 @@ public class TwitterListener extends ListenerAdapter<PircBotX> {
 					toPrint += user;
 				}
 				bot.sendMessage(channel, "Watching the following twitter accounts: " + toPrint);
+			} else if (scanner.hasNext("bootstrap")) {
+				this.checkTwitterOauthNeeded();
+				if (!this.oauthInit) {
+					return;
+				}
+				String users = this.props.getProperty("twitter_bootstrap");
+				if (users != null) {
+					this.bulkAddTwitterUsers(users.split(","));
+				} else {
+					bot.sendMessage(channel, "Default twitter users not found");
+				}
 			} else if (scanner.hasNext("oauth")) {
 				scanner.next();
 				if (scanner.hasNext()) {
@@ -210,6 +223,21 @@ public class TwitterListener extends ListenerAdapter<PircBotX> {
 				System.out.println("twitter4j.properties not found");
 				this.getTwitterOauthRequestToken();
 			}
+		}
+	}
+
+	private void bulkAddTwitterUsers(String[] users) {
+		Twitter tw = TwitterFactory.getSingleton();
+		ResponseList<User> userIdents;
+		try {
+			userIdents = tw.lookupUsers(users);
+			for (User u : userIdents) {
+				this.usersToFollow.put(u.getName().toLowerCase(), u.getId());
+			}
+			setFilter();
+			bot.sendMessage(channel, "Bulk added " + users.length + " users.");
+		} catch (TwitterException e) {
+			bot.sendMessage(channel, "Failed to bulk add twitter users");
 		}
 	}
 	
