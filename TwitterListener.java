@@ -124,6 +124,19 @@ public class TwitterListener extends ListenerAdapter<PircBotX> {
 				this.usersToFollow.clear();
 				bot.sendMessage(channel, "Purged all twitter users");
 				setFilter();
+			} else if (scanner.hasNext("list")) {
+				this.checkTwitterOauthNeeded();
+				if (!this.oauthInit) {
+					return;
+				}
+				String toPrint = "";
+				for (String user : this.usersToFollow.keySet()) {
+					if (toPrint != "") {
+						toPrint += ", ";
+					}
+					toPrint += user;
+				}
+				bot.sendMessage(channel, "Watching the following twitter accounts: " + toPrint);
 			} else if (scanner.hasNext("oauth")) {
 				scanner.next();
 				if (scanner.hasNext()) {
@@ -137,7 +150,7 @@ public class TwitterListener extends ListenerAdapter<PircBotX> {
 					}
 				}
 			} else {
-				bot.sendMessage(channel, "Valid commands are add, remove, purge and oauth.");
+				bot.sendMessage(channel, "Valid commands are add, remove, purge, list and oauth.");
 			}
 		}
 	}
