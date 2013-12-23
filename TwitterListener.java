@@ -63,8 +63,10 @@ public class TwitterListener extends ListenerAdapter<PircBotX> {
 			@Override
 			public void onStatus(Status status) {
 				User u = status.getUser();
-				if (parent.usersToFollow.containsValue(u.getId())) {
-					bot.sendMessage(channel, Colors.BOLD + "[TWITTER] @" + status.getUser().getScreenName() + ": " + status.getText());
+				String message = status.getText();
+				if (parent.usersToFollow.containsValue(u.getId()) && 
+				    !message.startsWith("@")) {
+					bot.sendMessage(channel, Colors.BOLD + "[TWITTER] @" + status.getUser().getScreenName() + ": " + message);
 				}
 			}
 
