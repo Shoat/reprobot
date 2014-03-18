@@ -11,7 +11,6 @@ public class ReproBot extends ListenerAdapter {
 	public static void main(String[] args) throws Exception {
 		
 		//instantiate underlying bot
-		PircBotX sourceBot = new PircBotX();
 		PircBotX destBot = new PircBotX();
 
 		//load properties from disk
@@ -25,13 +24,9 @@ public class ReproBot extends ListenerAdapter {
 			System.out.println("Modify this file and re-run.");
 			
 			try {
-				props.setProperty("source_irc_server", "irc.slashnet.org");
-				props.setProperty("source_irc_channel", "#reprobotsource,#reprobotsource1");
 				props.setProperty("dest_irc_server", "irc.slashnet.org");
 				props.setProperty("dest_irc_channel", "#reprobotdest");
-				props.setProperty("source_bot_nick", "reprobot");
 				props.setProperty("dest_bot_nick", "reprobot2");
-				props.setProperty("source_nick_pass", "");
 				props.setProperty("dest_nick_pass", "");
 				props.setProperty("ownernick", "maradine");
 				props.setProperty("twitter_bootstrap", "user1,user2");
@@ -44,17 +39,13 @@ public class ReproBot extends ListenerAdapter {
 
 		} 			
 		props.load(fis);
-		if (!props.containsKey("source_irc_server") || !props.containsKey("source_irc_channel") ||
-				!props.containsKey("dest_irc_server") || !props.containsKey("dest_irc_channel") ||
-				!props.containsKey("source_bot_nick") || !props.containsKey("dest_bot_nick")) {
+		if (!props.containsKey("dest_irc_server") || !props.containsKey("dest_irc_channel") ||
+				!props.containsKey("dest_bot_nick")) {
 			System.out.println("Config file is incomplete.  Delete it to receive a working template.");
 			System.exit(1);
 		}
-		String sourceIrcServer = props.getProperty("source_irc_server");
-		String sourceIrcChannels = props.getProperty("source_irc_channel");
 		String destIrcServer = props.getProperty("dest_irc_server");
 		String destIrcChannel = props.getProperty("dest_irc_channel");
-		String sourceBotNick = props.getProperty("source_bot_nick");
 		String destBotNick = props.getProperty("dest_bot_nick");
 		String ownernick = props.getProperty("ownernick");
 		
@@ -63,29 +54,17 @@ public class ReproBot extends ListenerAdapter {
 		
 		//add misc listeners.  only dest bot gets command handlers
 		destBot.getListenerManager().addListener(new PermissionsHandler());
-		SourceHandler sh = new SourceHandler(sourceBot, destBot, props);
-		sourceBot.getListenerManager().addListener(sh);
-		destBot.getListenerManager().addListener(new DestHandler(sourceBot, destBot, sh, props));
 
 		//set up twitter listener
 		destBot.getListenerManager().addListener(new TwitterListener(destBot, destIrcChannel, props));
 
 		//connect
-		sourceBot.setVerbose(true);
 		destBot.setVerbose(true);
-		sourceBot.setName(sourceBotNick);
 		destBot.setName(destBotNick);
-		sourceBot.connect(sourceIrcServer);
 		destBot.connect(destIrcServer);
 		
 		//identify with nickserv if so enabled
-		String sourceNickPass = props.getProperty("source_nick_pass");
 		String destNickPass = props.getProperty("dest_nick_pass");
-		if (sourceNickPass != null) {
-			if (!sourceNickPass.isEmpty()) {
-				sourceBot.identify(sourceNickPass);
-			}
-		}
 		if (destNickPass != null) {
 			if (!destNickPass.isEmpty()) {
 				destBot.identify(destNickPass);
@@ -93,27 +72,12 @@ public class ReproBot extends ListenerAdapter {
 		}
 
 
-		//join channels
-		String[] channels = sourceIrcChannels.split(",");
-		for (String channel : channels) {
-			sourceBot.joinChannel(channel);
-		}
-		if (channels.length > 1) {
-			props.setProperty("multichannel", "true");
-		} else {
-			props.setProperty("multichannel", "false");
-		}
+		//join channel
 		destBot.joinChannel(destIrcChannel);
 		
 		//pause to let channel join complete.  If we failed, exit.	
 		Thread.sleep(5000);
 		boolean killit = false;
-		for (String channel : channels) {
-			if (!sourceBot.channelExists(channel)) {
-				System.out.println("*** Bot failed to connect to channel \""+channel+"\".  Either we got shunted,  or the server is experiencing unusual load.");
-				killit = true;
-			}
-		}
 		if (!destBot.channelExists(destIrcChannel)) {
 			System.out.println("*** Bot failed to connect to channel \""+destIrcChannel+"\".  Either we got shunted, or the server is experiencing unusual load.");
 			killit = true;
